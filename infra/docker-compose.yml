@@ -53,7 +53,9 @@ services:
       - storage_data:/data
       - ./seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
     healthcheck:
-      test: ["CMD-SHELL", "wget -q -O- http://localhost:9333/cluster/status || exit 1"]
+      # SeaweedFS escucha en la IP del contenedor, no en 127.0.0.1: un
+      # healthcheck contra localhost da "connection refused" aunque funcione.
+      test: ["CMD-SHELL", "wget -q -O- http://$$(hostname -i):9333/cluster/status || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 12
@@ -79,7 +81,10 @@ services:
       timeout: 5s
       retries: 5
 
-  # Worker ligero: deduplicacion y tareas que no necesitan torch.
+  # Worker ligero: tareas de la cola por defecto (deduplicacion). El analisis
+  # de IA y el video van a `worker-ia`. Sin ese servicio levantado, los reportes
+  # se quedan en estado "recibido" en vez de pasar a "en_revision", pero siguen
+  # apareciendo en la cola del revisor: el flujo humano nunca depende de la IA.
   worker:
     build:
       context: ../backend
