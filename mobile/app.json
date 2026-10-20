@@ -40,7 +40,9 @@
       },
       "predictiveBackGestureEnabled": false
     },
-    "web": { "favicon": "./assets/favicon.png" },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
     "plugins": [
       "expo-router",
       "expo-secure-store",
@@ -63,11 +65,13 @@
       ],
       [
         "expo-notifications",
-        { "color": "#0E2A47" }
+        {
+          "color": "#0E2A47"
+        }
       ]
     ],
     "extra": {
-      "apiUrl": "http://192.168.1.100:8000/api/v1"
+      "apiUrl": "http://localhost:8000/api/v1"
     }
   }
 }

@@ -45,6 +45,9 @@ export default function Mapa() {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
+        // Sin esto el ScrollView se estira y los chips ocupan media pantalla:
+        // dentro de un contenedor flex, un ScrollView crece por defecto.
+        style={e.barraFiltros}
         contentContainerStyle={e.filtros}
       >
         {FILTROS.map((f) => {
@@ -110,7 +113,8 @@ export default function Mapa() {
 }
 
 const e = StyleSheet.create({
-  filtros: { gap: espacio.sm, padding: espacio.sm },
+  barraFiltros: { flexGrow: 0, flexShrink: 0 },
+  filtros: { gap: espacio.sm, padding: espacio.sm, alignItems: 'center' },
   chip: {
     minHeight: 36,
     justifyContent: 'center',

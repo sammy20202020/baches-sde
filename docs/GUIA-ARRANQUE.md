@@ -66,8 +66,11 @@ operadores: es solo para revisores y administradores.
 
 ### 4.1 Apuntar la app a tu computadora
 
-El telefono no resuelve `localhost`: hay que poner la IP de tu maquina en la red
-local. Busca la tuya con:
+En el **simulador de iOS** no hay que tocar nada: `localhost` ya apunta al Mac y
+es el valor por defecto en `mobile/app.json`.
+
+En un **telefono fisico** si: el telefono no resuelve `localhost`, hay que poner
+la IP de tu maquina en la red local. Busca la tuya con:
 
 ```bash
 ipconfig getifaddr en0
