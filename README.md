@@ -82,6 +82,7 @@ la tabla de usuarios. Hay pruebas automatizadas que lo verifican.
 | [ARQUITECTURA.md](docs/ARQUITECTURA.md) | Flujo de datos, modelo de datos y decisiones tecnicas |
 | [ROADMAP-SPRINTS.md](docs/ROADMAP-SPRINTS.md) | Los 13 sprints y que queda hecho ya |
 | [COSTOS.md](docs/COSTOS.md) | Que cuesta dinero, que no, y como terminar la tesis en 0 USD |
+| [ANDROID.md](docs/ANDROID.md) | Instalar la app en un telefono Android: Expo Go, build por USB o APK |
 
 ---
 

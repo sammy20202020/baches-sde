@@ -66,23 +66,19 @@ operadores: es solo para revisores y administradores.
 
 ### 4.1 Apuntar la app a tu computadora
 
-En el **simulador de iOS** no hay que tocar nada: `localhost` ya apunta al Mac y
-es el valor por defecto en `mobile/app.json`.
+**No hay que configurar nada.** La app deduce sola la direccion de la API a
+partir de la direccion desde la que cargo el bundle (`hostUri` de Expo): en el
+simulador sale `localhost` y en un telefono fisico sale la IP de tu Wi-Fi.
 
-En un **telefono fisico** si: el telefono no resuelve `localhost`, hay que poner
-la IP de tu maquina en la red local. Busca la tuya con:
+Lo unico obligatorio es que **el telefono y la computadora esten en la misma red
+Wi-Fi**.
 
-```bash
-ipconfig getifaddr en0
-```
-
-Y ponla en `mobile/app.json`, en `expo.extra.apiUrl`:
+Para apuntar a un servidor desplegado (un VPS), se pone la URL en
+`mobile/app.json` y esa manda sobre la deteccion automatica:
 
 ```json
-"extra": { "apiUrl": "http://192.168.1.100:8000/api/v1" }
+"extra": { "apiUrl": "https://api.tudominio.com/api/v1" }
 ```
-
-El telefono y la computadora deben estar en la misma red Wi-Fi.
 
 ### 4.2 Expo Go (rapido, sin video)
 
