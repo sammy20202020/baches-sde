@@ -27,7 +27,7 @@ monta este repositorio.
 | Inferencia de IA | No se corre YOLO en el teléfono | La IA vive en el backend (Celery workers). El móvil solo sube evidencia. Coincide con la propuesta |
 | Modo sin conexión (RF-07/08) | AsyncStorage no sirve para colas con integridad | **expo-sqlite** + cola de outbox con `idempotency_key` UUIDv4 generada en el dispositivo |
 | Notificaciones push (RF-10) | Requiere credenciales FCM (Android) y APNs (iOS) | `expo-notifications` + Expo Push Service; el backend guarda `expo_push_token` por dispositivo |
-| iOS sin cuenta de Apple Developer | No se puede instalar en iPhone físico sin cuenta ($99/año) | Para la tesis: Android dev build + simulador iOS. Dejar documentada la limitación |
+| iOS sin cuenta de Apple Developer | Con un Apple ID gratis **sí** se instala en un iPhone físico (free provisioning), pero el perfil caduca a los **7 días** y la app deja de abrir | Para la tesis alcanza: se recompila desde Xcode antes de cada sesión de campo o de la defensa. Los $99/año solo hacen falta para TestFlight, App Store o perfiles de 1 año |
 | Mapas | `react-native-maps` usa Google Maps en Android (API key) y Apple Maps en iOS | API key de Google Maps solo para Android; iOS funciona sin key |
 
 ---
@@ -161,8 +161,11 @@ Total estimado por la propuesta: **930 h** (644 desarrollo + 286 pruebas) para 3
 ## 7. Qué falta decidir con el equipo / asesor
 
 - Proveedor del VPS y región (afecta latencia y RNF-03: p95 < 2 s).
-- ¿Hay cuenta Apple Developer para distribuir el IPA? Si no, la evaluación en iPhone se
-  limita a simulador y hay que escribirlo en la tesis.
+- ¿Se paga la cuenta Apple Developer ($99/año) o se trabaja con free provisioning
+  recompilando cada 7 días? Con free provisioning la evaluación en iPhone físico es
+  posible; sin ella NO queda limitada a simulador, como se pensó al inicio.
+  Verificar además si la universidad tiene membresía institucional: Apple exime la
+  cuota a instituciones educativas acreditadas.
 - Protocolo ético / consentimiento para rostros y placas en el video (la propuesta lo
   menciona; falta el documento firmado).
 - Archivos GPX definitivos de las 4 rutas (la propuesta dice que se fijan en Sprint 0).

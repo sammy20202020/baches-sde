@@ -81,6 +81,7 @@ la tabla de usuarios. Hay pruebas automatizadas que lo verifican.
 | [GUIA-ARRANQUE.md](docs/GUIA-ARRANQUE.md) | Puesta en marcha paso a paso, incluido el telefono fisico |
 | [ARQUITECTURA.md](docs/ARQUITECTURA.md) | Flujo de datos, modelo de datos y decisiones tecnicas |
 | [ROADMAP-SPRINTS.md](docs/ROADMAP-SPRINTS.md) | Los 13 sprints y que queda hecho ya |
+| [COSTOS.md](docs/COSTOS.md) | Que cuesta dinero, que no, y como terminar la tesis en 0 USD |
 
 ---
 

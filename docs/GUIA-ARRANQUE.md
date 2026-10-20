@@ -106,9 +106,19 @@ Para Android hace falta una **API key de Google Maps** en
 `mobile/app.json` → `android.config.googleMaps.apiKey`. En iOS no se necesita:
 usa Apple Maps.
 
-Para instalar en un **iPhone fisico** hace falta una cuenta de Apple Developer
-(99 USD/ano). Sin ella la evaluacion en iOS se limita al simulador, y conviene
-dejarlo escrito en la tesis.
+### 4.4 iPhone fisico sin pagar la cuenta de Apple
+
+Con un **Apple ID gratis** se puede firmar e instalar la app en tu propio iPhone
+("free provisioning"): en Xcode, pestana Signing & Capabilities, eliges tu
+Personal Team y conectas el telefono.
+
+El limite: el perfil **caduca a los 7 dias** y la app deja de abrir. Hay que
+reconstruir desde Xcode para renovarlo otros 7 dias. Para la tesis alcanza —
+basta recompilar antes de cada salida de campo o de la defensa.
+
+La cuota de 99 USD/ano solo hace falta para TestFlight, publicar en la App Store
+o tener perfiles que duren un ano. Apple la exime a instituciones educativas
+acreditadas: vale la pena preguntar en la universidad antes de pagarla.
 
 ---
 
