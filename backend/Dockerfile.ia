@@ -1,0 +1,20 @@
+# Imagen del worker de vision artificial. Separada de la API porque torch pesa ~3 GB.
+FROM python:3.13-slim
+
+ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      libpq5 libgl1 libglib2.0-0 ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt requirements-ia.txt ./
+RUN pip install --no-cache-dir -r requirements.txt \
+    && pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu torch torchvision \
+    && pip install --no-cache-dir ultralytics opencv-python-headless imagehash Pillow
+
+COPY . .
+
+CMD ["celery", "-A", "app.workers.celery_app.celery_app", "worker", \
+     "--loglevel=info", "--queues=ia,video", "--concurrency=2"]

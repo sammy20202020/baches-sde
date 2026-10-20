@@ -1,0 +1,82 @@
+# Integracion continua: reconstruye el entorno desde cero en cada cambio para
+# detectar dependencias no declaradas.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgis/postgis:16-3.5
+        env:
+          POSTGRES_DB: baches
+          POSTGRES_USER: baches
+          POSTGRES_PASSWORD: baches
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U baches" --health-interval 5s
+          --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:7.4-alpine
+        ports: ['6379:6379']
+
+    env:
+      DATABASE_URL: postgresql+psycopg://baches:baches@localhost:5432/baches
+      REDIS_URL: redis://localhost:6379/0
+      JWT_SECRET: secreto-solo-para-ci-no-usar-en-produccion
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+
+      - name: Instalar dependencias
+        working-directory: backend
+        run: pip install -r requirements-dev.txt
+
+      - name: Verificar que no hay deriva de migraciones
+        working-directory: backend
+        run: |
+          alembic upgrade head
+          alembic check
+
+      - name: Pruebas
+        working-directory: backend
+        run: pytest -q
+
+  movil:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - working-directory: mobile
+        run: npm ci
+      - name: Typecheck
+        working-directory: mobile
+        run: npx tsc --noEmit
+
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - working-directory: web
+        run: npm ci
+      - name: Construir
+        working-directory: web
+        run: npm run build

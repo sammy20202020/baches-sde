@@ -1,0 +1,122 @@
+# Entorno reproducible para los 3 miembros del equipo (Docker + Compose).
+# Levantar desde la raiz:  make up
+name: baches-sde
+
+services:
+  db:
+    # Imagen multi-arquitectura (amd64 + arm64): los Mac con Apple Silicon la
+    # corren nativa. La oficial `postgis/postgis:16-3.5` es solo amd64 y en
+    # arm64 arranca emulada (mucho mas lenta).
+    image: imresamu/postgis:16-3.5
+    environment:
+      POSTGRES_DB: baches
+      POSTGRES_USER: baches
+      POSTGRES_PASSWORD: baches
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U baches -d baches"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7.4-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Almacenamiento de objetos compatible con S3 (evidencia: fotos y videos).
+  # Se usa SeaweedFS en lugar de MinIO porque las imagenes publicas de MinIO
+  # dejaron de distribuirse en Docker Hub. La API es la misma (S3), asi que el
+  # codigo no cambia y en el VPS se puede sustituir por S3, R2, Spaces o MinIO
+  # autoalojado solo cambiando S3_ENDPOINT_URL y las llaves.
+  storage:
+    image: chrislusf/seaweedfs:3.97
+    command: >
+      server -dir=/data -s3 -s3.port=8333
+      -s3.config=/etc/seaweedfs/s3.json
+      -master.volumeSizeLimitMB=1024
+    ports:
+      - "8333:8333"   # API S3
+      - "9333:9333"   # consola del master
+    volumes:
+      - storage_data:/data
+      - ./seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O- http://localhost:9333/cluster/status || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  api:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    env_file: ../backend/.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      db: {condition: service_healthy}
+      redis: {condition: service_healthy}
+    volumes:
+      - ../backend:/app
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/salud"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  # Worker ligero: deduplicacion y tareas que no necesitan torch.
+  worker:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    env_file: ../backend/.env
+    depends_on:
+      db: {condition: service_healthy}
+      redis: {condition: service_healthy}
+    volumes:
+      - ../backend:/app
+    command: celery -A app.workers.celery_app.celery_app worker --loglevel=info --queues=celery
+
+  # Worker de vision artificial. Imagen pesada: se construye con `make build-ia`.
+  worker-ia:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile.ia
+    env_file: ../backend/.env
+    depends_on:
+      db: {condition: service_healthy}
+      redis: {condition: service_healthy}
+    volumes:
+      - ../backend:/app
+      - ../modelos:/app/models:ro
+    profiles: ["ia"]
+
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - api
+    profiles: ["proxy"]
+
+volumes:
+  db_data:
+  redis_data:
+  storage_data:

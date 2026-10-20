@@ -1,0 +1,73 @@
+{
+  "expo": {
+    "name": "Baches SDE",
+    "slug": "baches-sde",
+    "scheme": "bachessde",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "do.edu.bachessde",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Se usa la camara para fotografiar el bache que vas a reportar.",
+        "NSLocationWhenInUseUsageDescription": "Se usa tu ubicacion para ubicar el bache en el mapa. Puedes corregirla antes de enviar.",
+        "NSPhotoLibraryAddUsageDescription": "Permite guardar la foto del reporte en tu galeria.",
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "do.edu.bachessde",
+      "adaptiveIcon": {
+        "backgroundColor": "#0E2A47",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "permissions": [
+        "CAMERA",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "RECORD_AUDIO",
+        "POST_NOTIFICATIONS"
+      ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "PONER_AQUI_LA_API_KEY_DE_GOOGLE_MAPS_ANDROID"
+        }
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": { "favicon": "./assets/favicon.png" },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-sqlite",
+      "expo-dev-client",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Se usa la camara para fotografiar el bache que vas a reportar.",
+          "microphonePermission": "El audio se graba junto al video del recorrido tecnico.",
+          "recordAudioAndroid": true
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Se usa tu ubicacion para ubicar el bache. No hay seguimiento continuo de ciudadanos.",
+          "isAndroidForegroundServiceEnabled": true
+        }
+      ],
+      [
+        "expo-notifications",
+        { "color": "#0E2A47" }
+      ]
+    ],
+    "extra": {
+      "apiUrl": "http://192.168.1.100:8000/api/v1"
+    }
+  }
+}

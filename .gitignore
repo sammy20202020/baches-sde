@@ -1,0 +1,31 @@
+# --- Secretos: nunca en Git (RNF-01) ---
+.env
+.env.local
+*.env.local
+backend/.env
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# --- Node ---
+node_modules/
+dist/
+.expo/
+*.tsbuildinfo
+
+# --- Nativo (lo genera `expo prebuild`) ---
+mobile/ios/
+mobile/android/
+
+# --- Evidencia y modelos: pesados, fuera del repositorio ---
+modelos/*.pt
+datos/
+evidencia/
+
+# --- Sistema ---
+.DS_Store
+*.log

@@ -1,0 +1,11 @@
+# Dependencias del worker de vision artificial (RF-06, RF-14).
+# Se instalan SOLO en el servicio `worker-ia` (Dockerfile.ia): la imagen pesa ~3 GB.
+# Para CPU, instalar torch desde el indice de PyTorch:
+#   pip install --index-url https://download.pytorch.org/whl/cpu torch torchvision
+torch==2.14.1
+torchvision==0.29.1
+ultralytics==8.4.183
+opencv-python-headless==5.0.0.93
+numpy==2.5.4
+ImageHash==4.3.2
+pillow==13.0.0

@@ -1,0 +1,11 @@
+{
+  "identities": [
+    {
+      "name": "baches-dev",
+      "credentials": [
+        { "accessKey": "bachesdev", "secretKey": "bachesdev-secret" }
+      ],
+      "actions": ["Admin", "Read", "Write", "List", "Tagging"]
+    }
+  ]
+}
