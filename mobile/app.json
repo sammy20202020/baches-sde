@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "do.edu.bachessde",
+      "bundleIdentifier": "com.bachessde.app",
       "infoPlist": {
         "NSCameraUsageDescription": "Se usa la camara para fotografiar el bache que vas a reportar.",
         "NSLocationWhenInUseUsageDescription": "Se usa tu ubicacion para ubicar el bache en el mapa. Puedes corregirla antes de enviar.",
@@ -19,7 +19,7 @@
       }
     },
     "android": {
-      "package": "do.edu.bachessde",
+      "package": "com.bachessde.app",
       "adaptiveIcon": {
         "backgroundColor": "#0E2A47",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -71,7 +71,7 @@
       ]
     ],
     "extra": {
-      "apiUrl": ""
+      "apiUrl": "http://10.0.0.77:8000/api/v1"
     }
   }
 }

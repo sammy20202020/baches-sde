@@ -21,6 +21,9 @@ dist/
 mobile/ios/
 mobile/android/
 
+# --- APK compilado: pesa ~120 MB, se regenera con gradlew assembleRelease ---
+apk/
+
 # --- Evidencia y modelos: pesados, fuera del repositorio ---
 modelos/*.pt
 datos/
