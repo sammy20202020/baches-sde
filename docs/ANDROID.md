@@ -106,6 +106,24 @@ conviene desplegar la API en un servidor (ver COSTOS.md, seccion 2.3).
 
 ---
 
+## Trafico HTTP sin cifrar
+
+Desde Android 9, el sistema **bloquea todo el trafico `http://`** salvo que la
+app lo declare. El manifiesto de debug que genera Expo lo permite, pero el de
+release **no**: por eso un APK de release no alcanza una API en `http://IP:8000`
+aunque el telefono y la computadora esten en la misma red. La app no se cae,
+simplemente dice "Sin conexion con el servidor".
+
+Esta activado en `app.json` via `expo-build-properties`:
+
+```json
+["expo-build-properties", { "android": { "usesCleartextTraffic": true } }]
+```
+
+**Quitarlo cuando la API tenga HTTPS.** Mientras exista, cualquiera en la misma
+red puede leer el trafico entre el telefono y el servidor. Para la tesis en red
+local es aceptable; para un despliegue real no lo es.
+
 ## Problemas comunes
 
 **El telefono no ve la API.** Verifica que ambos esten en la misma Wi-Fi y que

@@ -75,7 +75,8 @@
         {
           "android": {
             "enableProguardInReleaseBuilds": false,
-            "enableShrinkResourcesInReleaseBuilds": false
+            "enableShrinkResourcesInReleaseBuilds": false,
+            "usesCleartextTraffic": true
           }
         }
       ]
