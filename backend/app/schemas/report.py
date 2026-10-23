@@ -6,9 +6,22 @@ from pydantic import BaseModel, Field, field_validator
 from app.core.config import settings
 from app.models.report import EstadoReporte, Origen, Severidad
 
-# Caja aproximada de Santo Domingo Este. RF-05: coherencia geografica.
-SDE_LAT = (18.40, 18.58)
-SDE_LON = (-69.95, -69.70)
+# RF-05: coherencia geografica.
+#
+# Caja del limite municipal real de Santo Domingo Este, tomado de la relacion
+# administrativa de OpenStreetMap (admin_level 6, 2343 nodos):
+#     lat 18.4547 .. 18.5982   lon -69.8979 .. -69.7026
+#
+# Se agrega un margen de 0.005 grados (~550 m) para no rechazar un reporte
+# legitimo pegado al borde cuando el GPS trae error. La caja anterior cortaba
+# en 18.58 y dejaba fuera los 2 km mas al norte del municipio.
+#
+# Es una aproximacion rectangular: el municipio no es un rectangulo, asi que
+# acepta algo de territorio vecino. Para apretarlo habria que validar contra el
+# poligono con ST_Contains, a cambio de una consulta a la base en cada reporte.
+MARGEN_BORDE = 0.005
+SDE_LAT = (18.4547 - MARGEN_BORDE, 18.5982 + MARGEN_BORDE)
+SDE_LON = (-69.8979 - MARGEN_BORDE, -69.7026 + MARGEN_BORDE)
 
 
 class Punto(BaseModel):

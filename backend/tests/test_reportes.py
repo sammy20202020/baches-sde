@@ -131,3 +131,27 @@ def test_mapa_publico_no_expone_datos_personales(client, token, foto_jpeg, crear
     }
     texto = client.get("/api/v1/mapa/publico").text
     assert "@" not in texto and "autor" not in texto
+
+def test_acepta_el_norte_del_municipio(client, token, foto_jpeg):
+    """El limite de Santo Domingo Este llega a 18.5982, no a 18.58.
+
+    La caja del validador cortaba en 18.58 y rechazaba los 2 km mas al norte
+    del municipio: un ciudadano que reportara ahi recibia un 422.
+    """
+    t_ = token()
+    r = _crear(client, t_, foto_jpeg, lat="18.5900", lon="-69.8000")
+    assert r.status_code == 201, r.text
+
+
+def test_acepta_el_borde_este(client, token, foto_jpeg):
+    """El municipio llega hasta -69.7026 por el este."""
+    t_ = token()
+    r = _crear(client, t_, foto_jpeg, lat="18.5000", lon="-69.7050")
+    assert r.status_code == 201, r.text
+
+
+def test_rechaza_mas_alla_del_municipio(client, token, foto_jpeg):
+    """La Avenida Ecologica sigue al este fuera de SDE: ahi no se reporta."""
+    t_ = token()
+    r = _crear(client, t_, foto_jpeg, lat="18.4700", lon="-69.6500")
+    assert r.status_code == 422
