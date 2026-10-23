@@ -37,6 +37,10 @@ function Guardia() {
         name="recorrido"
         options={{ headerShown: true, title: 'Recorrido tecnico', presentation: 'modal' }}
       />
+      <Stack.Screen
+        name="privacidad"
+        options={{ headerShown: true, title: 'Privacidad', presentation: 'modal' }}
+      />
     </Stack>
   );
 }

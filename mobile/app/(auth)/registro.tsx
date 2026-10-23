@@ -1,7 +1,7 @@
 /** RF-01: cuenta con nombre, correo, contrasena y consentimiento de privacidad. */
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 
 import { mensajeDeError } from '@/api/client';
 import { useAuth } from '@/store/auth';
@@ -10,6 +10,7 @@ import { colores, espacio, TOQUE_MINIMO } from '@/ui/theme';
 
 export default function Registro() {
   const registro = useAuth((s) => s.registro);
+  const router = useRouter();
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -72,7 +73,15 @@ export default function Registro() {
             {acepta && <Text style={{ color: '#FFF', fontWeight: '800' }}>✓</Text>}
           </View>
           <Text style={e.consentimientoTexto}>
-            Acepto la politica de privacidad. Mi nombre y correo no se publican en el mapa.
+            Acepto la{' '}
+            <Text
+              style={e.enlaceTexto}
+              onPress={() => router.push('/privacidad')}
+              accessibilityRole="link"
+            >
+              politica de privacidad
+            </Text>
+            . Mi nombre y correo no se publican en el mapa.
           </Text>
         </Pressable>
 
@@ -110,6 +119,7 @@ const e = StyleSheet.create({
     backgroundColor: colores.superficie,
   },
   consentimientoTexto: { flex: 1, color: colores.texto, lineHeight: 20 },
+  enlaceTexto: { color: colores.primarioClaro, fontWeight: '700', textDecorationLine: 'underline' },
   pie: { flexDirection: 'row', justifyContent: 'center', marginTop: espacio.lg },
   enlace: { color: colores.primarioClaro, fontWeight: '700' },
 });

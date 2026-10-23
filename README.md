@@ -83,6 +83,8 @@ la tabla de usuarios. Hay pruebas automatizadas que lo verifican.
 | [ROADMAP-SPRINTS.md](docs/ROADMAP-SPRINTS.md) | Los 13 sprints y que queda hecho ya |
 | [COSTOS.md](docs/COSTOS.md) | Que cuesta dinero, que no, y como terminar la tesis en 0 USD |
 | [ANDROID.md](docs/ANDROID.md) | Instalar la app en un telefono Android: Expo Go, build por USB o APK |
+| [PROTOCOLO-ETICO.md](docs/PROTOCOLO-ETICO.md) | Tratamiento de datos, consentimiento, rostros y placas. **Firmar antes de grabar** |
+| [RUTAS.md](docs/RUTAS.md) | Los 4 corredores de evaluacion y el limite municipal |
 
 ---
 
