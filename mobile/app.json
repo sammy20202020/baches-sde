@@ -82,7 +82,7 @@
       ]
     ],
     "extra": {
-      "apiUrl": "http://10.0.0.77:8000/api/v1"
+      "apiUrl": ""
     }
   }
 }

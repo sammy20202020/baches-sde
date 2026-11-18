@@ -9,6 +9,9 @@ import { abrir } from '@/db/outbox';
 import { observarRed, sincronizar } from '@/db/sync';
 import { colores } from '@/ui/theme';
 
+/** Accesibles sin sesion iniciada. */
+const RUTAS_PUBLICAS = ['privacidad', 'servidor'];
+
 function Guardia() {
   const { usuario, cargando } = useAuth();
   const segmentos = useSegments();
@@ -17,7 +20,11 @@ function Guardia() {
   useEffect(() => {
     if (cargando) return;
     const enAuth = segmentos[0] === '(auth)';
-    if (!usuario && !enAuth) router.replace('/(auth)/login');
+    // Rutas que deben abrirse SIN sesion: la politica hay que poder leerla
+    // antes de aceptarla al registrarse, y el servidor hay que poder
+    // configurarlo justo cuando el login falla por no alcanzar la API.
+    const enPublica = RUTAS_PUBLICAS.includes(segmentos[0] ?? '');
+    if (!usuario && !enAuth && !enPublica) router.replace('/(auth)/login');
     if (usuario && enAuth) router.replace('/(tabs)');
   }, [usuario, cargando, segmentos, router]);
 
@@ -40,6 +47,10 @@ function Guardia() {
       <Stack.Screen
         name="privacidad"
         options={{ headerShown: true, title: 'Privacidad', presentation: 'modal' }}
+      />
+      <Stack.Screen
+        name="servidor"
+        options={{ headerShown: true, title: 'Servidor', presentation: 'modal' }}
       />
     </Stack>
   );

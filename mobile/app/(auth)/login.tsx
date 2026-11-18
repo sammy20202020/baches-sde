@@ -68,6 +68,12 @@ export default function Login() {
             Crear cuenta
           </Link>
         </View>
+
+        <View style={[e.pie, { marginTop: espacio.sm }]}>
+          <Link href="/servidor" style={e.enlaceSuave}>
+            Configurar servidor
+          </Link>
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -79,4 +85,5 @@ const e = StyleSheet.create({
   subtitulo: { fontSize: 16, color: colores.textoSuave, marginBottom: espacio.xl },
   pie: { flexDirection: 'row', justifyContent: 'center', marginTop: espacio.lg },
   enlace: { color: colores.primarioClaro, fontWeight: '700' },
+  enlaceSuave: { color: colores.textoSuave, fontSize: 13, textDecorationLine: 'underline' },
 });

@@ -6,32 +6,11 @@ import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import Constants from 'expo-constants';
 import * as SecureStore from 'expo-secure-store';
 
-/** Puerto donde escucha la API (docker-compose la publica en el 8000). */
-const PUERTO_API = 8000;
+import * as servidor from './servidor';
 
-/**
- * Deduce la URL de la API sin que nadie tenga que editar la IP a mano.
- *
- * Durante el desarrollo, Expo expone en `hostUri` la direccion desde la que el
- * telefono cargo el bundle (p. ej. "10.0.0.77:8081"). Esa es, por definicion,
- * la IP de la computadora alcanzable desde el telefono: en el simulador sale
- * localhost y en un telefono fisico sale la IP de la Wi-Fi. Reusarla evita el
- * error mas comun del equipo, que es olvidar actualizar la IP en app.json.
- *
- * `extra.apiUrl` manda si esta definido, para apuntar a un servidor real.
- */
-function resolverApiUrl(): string {
-  const configurada = Constants.expoConfig?.extra?.apiUrl as string | undefined;
-  if (configurada) return configurada;
-
-  const hostUri = Constants.expoConfig?.hostUri;
-  const host = hostUri?.split(':')[0];
-  if (host) return `http://${host}:${PUERTO_API}/api/v1`;
-
-  return `http://localhost:${PUERTO_API}/api/v1`;
-}
-
-const API_URL = resolverApiUrl();
+// La direccion del servidor se resuelve en cada peticion, no al importar el
+// modulo: el usuario puede cambiarla desde Ajustes sin reiniciar la app.
+const API_URL = servidor.actual();
 
 const CLAVE_ACCESS = 'baches.access_token';
 const CLAVE_REFRESH = 'baches.refresh_token';
@@ -49,9 +28,10 @@ export const tokens = {
   },
 };
 
-export const api = axios.create({ baseURL: API_URL, timeout: 20_000 });
+export const api = axios.create({ timeout: 20_000 });
 
 api.interceptors.request.use(async (config) => {
+  config.baseURL = await servidor.cargar();
   const access = await tokens.leerAccess();
   if (access) config.headers.Authorization = `Bearer ${access}`;
   return config;
@@ -64,7 +44,8 @@ async function renovar(): Promise<string | null> {
   const refresh = await tokens.leerRefresh();
   if (!refresh) return null;
   try {
-    const { data } = await axios.post(`${API_URL}/auth/refresh`, { refresh_token: refresh });
+    const base = await servidor.cargar();
+    const { data } = await axios.post(`${base}/auth/refresh`, { refresh_token: refresh });
     await tokens.guardar(data.access_token, data.refresh_token);
     return data.access_token as string;
   } catch {
@@ -97,7 +78,9 @@ api.interceptors.response.use(
 /** Traduce los errores de la API a algo legible para el usuario. */
 export function mensajeDeError(error: unknown): string {
   if (axios.isAxiosError(error)) {
-    if (!error.response) return 'Sin conexion con el servidor. Tu reporte queda guardado en el telefono.';
+    if (!error.response) {
+      return `Sin conexion con ${servidor.actual()}. Revisa la direccion en Ajustes, o tu reporte queda guardado en el telefono.`;
+    }
     const detalle = error.response.data?.detail;
     if (typeof detalle === 'string') return detalle;
     if (Array.isArray(detalle)) return detalle.map((d: { msg: string }) => d.msg).join('. ');
