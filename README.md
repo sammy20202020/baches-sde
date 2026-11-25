@@ -86,6 +86,7 @@ la tabla de usuarios. Hay pruebas automatizadas que lo verifican.
 | [PROTOCOLO-ETICO.md](docs/PROTOCOLO-ETICO.md) | Tratamiento de datos, consentimiento, rostros y placas. **Firmar antes de grabar** |
 | [RUTAS.md](docs/RUTAS.md) | Los 4 corredores de evaluacion y el limite municipal |
 | [DESVIACIONES.md](docs/DESVIACIONES.md) | Stack implementado y en que difiere de la propuesta, con su justificacion |
+| [openapi.json](docs/openapi.json) | Contrato completo de la API: 29 endpoints. Para implementar otro backend compatible |
 
 ---
 

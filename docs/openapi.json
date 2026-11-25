@@ -1,0 +1,2242 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Baches SDE",
+    "description": "API del sistema movil de deteccion, geolocalizacion, reporte y priorizacion de baches en Santo Domingo Este. Ninguna deteccion de IA se publica sin validacion humana.",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/salud": {
+      "get": {
+        "tags": [
+          "salud"
+        ],
+        "summary": "Salud",
+        "description": "Comprueba API + PostGIS. Lo usa docker-compose y la CI.",
+        "operationId": "salud_salud_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/registro": {
+      "post": {
+        "tags": [
+          "autenticacion"
+        ],
+        "summary": "Registro",
+        "description": "RF-01: cuenta con nombre, correo, contrasena y consentimiento de privacidad.",
+        "operationId": "registro_api_v1_auth_registro_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistroIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsuarioOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/verificar-email": {
+      "post": {
+        "tags": [
+          "autenticacion"
+        ],
+        "summary": "Verificar Email",
+        "operationId": "verificar_email_api_v1_auth_verificar_email_post",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "tags": [
+          "autenticacion"
+        ],
+        "summary": "Login",
+        "description": "RF-02. Mensaje de error generico: no revela si el correo existe.",
+        "operationId": "login_api_v1_auth_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokensOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/refresh": {
+      "post": {
+        "tags": [
+          "autenticacion"
+        ],
+        "summary": "Refresh",
+        "description": "Rotacion de refresh tokens: el anterior se revoca al usarse (RNF-01).",
+        "operationId": "refresh_api_v1_auth_refresh_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokensOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "tags": [
+          "autenticacion"
+        ],
+        "summary": "Logout",
+        "operationId": "logout_api_v1_auth_logout_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/yo": {
+      "get": {
+        "tags": [
+          "autenticacion"
+        ],
+        "summary": "Yo",
+        "operationId": "yo_api_v1_auth_yo_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsuarioOut"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/dispositivo": {
+      "post": {
+        "tags": [
+          "autenticacion"
+        ],
+        "summary": "Registrar Dispositivo",
+        "description": "RF-10: guarda/actualiza el token de Expo Push del dispositivo.",
+        "operationId": "registrar_dispositivo_api_v1_auth_dispositivo_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DispositivoIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/reportes": {
+      "post": {
+        "tags": [
+          "reportes"
+        ],
+        "summary": "Crear Reporte",
+        "description": "RF-04 + RF-05 + RF-08.\n\nMultipart porque la foto viaja junto a los metadatos en un solo envio: en red\nintermitente dos peticiones separadas dejan estados a medias.",
+        "operationId": "crear_reporte_api_v1_reportes_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "UUID generado por el dispositivo. Evita duplicados por reintento (RF-08).",
+              "title": "Idempotency-Key"
+            },
+            "description": "UUID generado por el dispositivo. Evita duplicados por reintento (RF-08)."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_crear_reporte_api_v1_reportes_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReporteOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reportes/mios": {
+      "get": {
+        "tags": [
+          "reportes"
+        ],
+        "summary": "Mis Reportes",
+        "description": "RF-09: historial personal con el estado de cada reporte.",
+        "operationId": "mis_reportes_api_v1_reportes_mios_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 100,
+              "title": "Limite"
+            }
+          },
+          {
+            "name": "desplazamiento",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "title": "Desplazamiento"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReporteOut"
+                  },
+                  "title": "Response Mis Reportes Api V1 Reportes Mios Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reportes/{reporte_id}": {
+      "get": {
+        "tags": [
+          "reportes"
+        ],
+        "summary": "Detalle",
+        "operationId": "detalle_api_v1_reportes__reporte_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "reporte_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Reporte Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReporteOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reportes/{reporte_id}/evidencia": {
+      "get": {
+        "tags": [
+          "reportes"
+        ],
+        "summary": "Evidencia Firmada",
+        "description": "Acceso temporal a la evidencia original. Restringido a autor y staff.",
+        "operationId": "evidencia_firmada_api_v1_reportes__reporte_id__evidencia_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "reporte_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Reporte Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mapa/publico": {
+      "get": {
+        "tags": [
+          "mapa publico"
+        ],
+        "summary": "Mapa Publico",
+        "description": "Endpoint PUBLICO (sin token).\n\nRNF-02: se seleccionan columnas explicitas y nunca se hace JOIN con `usuarios`,\nasi es imposible filtrar datos personales por descuido en el serializador.",
+        "operationId": "mapa_publico_api_v1_mapa_publico_get",
+        "parameters": [
+          {
+            "name": "estado",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/EstadoReporte"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Estado"
+            }
+          },
+          {
+            "name": "severidad",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Severidad"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Severidad"
+            }
+          },
+          {
+            "name": "desde",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Desde"
+            }
+          },
+          {
+            "name": "hasta",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Hasta"
+            }
+          },
+          {
+            "name": "lat",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Lat"
+            }
+          },
+          {
+            "name": "lon",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Lon"
+            }
+          },
+          {
+            "name": "radio_m",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 20000,
+              "minimum": 50,
+              "default": 2000,
+              "title": "Radio M"
+            }
+          },
+          {
+            "name": "limite",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 5000,
+              "minimum": 1,
+              "default": 500,
+              "title": "Limite"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mapa/resumen": {
+      "get": {
+        "tags": [
+          "mapa publico"
+        ],
+        "summary": "Resumen",
+        "description": "Conteo por severidad para la pantalla de inicio del movil.",
+        "operationId": "resumen_api_v1_mapa_resumen_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/revision/pendientes": {
+      "get": {
+        "tags": [
+          "revision"
+        ],
+        "summary": "Pendientes",
+        "description": "Cola de trabajo del revisor: todo lo que aun no es publico.",
+        "operationId": "pendientes_api_v1_revision_pendientes_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "title": "Limite"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/revision/{reporte_id}/duplicados": {
+      "get": {
+        "tags": [
+          "revision"
+        ],
+        "summary": "Duplicados",
+        "description": "RF-16: propone candidatos. No fusiona: solo informa al revisor.",
+        "operationId": "duplicados_api_v1_revision__reporte_id__duplicados_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "reporte_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Reporte Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/revision/{reporte_id}": {
+      "post": {
+        "tags": [
+          "revision"
+        ],
+        "summary": "Revisar",
+        "description": "RF-17 + RF-18. Unico camino por el que un reporte llega al mapa publico.",
+        "operationId": "revisar_api_v1_revision__reporte_id__post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "reporte_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Reporte Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RevisionIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/recorridos/rutas": {
+      "get": {
+        "tags": [
+          "recorridos tecnicos"
+        ],
+        "summary": "Listar Rutas",
+        "operationId": "listar_rutas_api_v1_recorridos_rutas_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RutaOut"
+                  },
+                  "type": "array",
+                  "title": "Response Listar Rutas Api V1 Recorridos Rutas Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/recorridos": {
+      "post": {
+        "tags": [
+          "recorridos tecnicos"
+        ],
+        "summary": "Iniciar",
+        "description": "RF-13: abre la sesion de grabacion. Idempotente por clave del dispositivo.",
+        "operationId": "iniciar_api_v1_recorridos_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecorridoIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecorridoOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/recorridos/{recorrido_id}/muestras": {
+      "post": {
+        "tags": [
+          "recorridos tecnicos"
+        ],
+        "summary": "Cerrar Con Muestras",
+        "description": "Sube el track GPS completo al terminar. Se envia en lote, no muestra por muestra.",
+        "operationId": "cerrar_con_muestras_api_v1_recorridos__recorrido_id__muestras_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "recorrido_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Recorrido Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecorridoCierreIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/recorridos/{recorrido_id}/video": {
+      "post": {
+        "tags": [
+          "recorridos tecnicos"
+        ],
+        "summary": "Subir Video",
+        "description": "RF-14: guarda el video y encola el procesamiento en segundo plano (RNF-04).",
+        "operationId": "subir_video_api_v1_recorridos__recorrido_id__video_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "recorrido_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Recorrido Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_subir_video_api_v1_recorridos__recorrido_id__video_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecorridoOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/recorridos/{recorrido_id}": {
+      "get": {
+        "tags": [
+          "recorridos tecnicos"
+        ],
+        "summary": "Estado",
+        "operationId": "estado_api_v1_recorridos__recorrido_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "recorrido_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Recorrido Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecorridoOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/usuarios": {
+      "get": {
+        "tags": [
+          "administracion"
+        ],
+        "summary": "Listar Usuarios",
+        "operationId": "listar_usuarios_api_v1_admin_usuarios_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/UsuarioAdminOut"
+                  },
+                  "type": "array",
+                  "title": "Response Listar Usuarios Api V1 Admin Usuarios Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/usuarios/{usuario_id}/rol": {
+      "patch": {
+        "tags": [
+          "administracion"
+        ],
+        "summary": "Cambiar Rol",
+        "operationId": "cambiar_rol_api_v1_admin_usuarios__usuario_id__rol_patch",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "usuario_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Usuario Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CambioRolIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsuarioAdminOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/rutas": {
+      "post": {
+        "tags": [
+          "administracion"
+        ],
+        "summary": "Crear Ruta",
+        "operationId": "crear_ruta_api_v1_admin_rutas_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RutaIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/auditoria": {
+      "get": {
+        "tags": [
+          "administracion"
+        ],
+        "summary": "Auditoria",
+        "description": "RF-20.",
+        "operationId": "auditoria_api_v1_admin_auditoria_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "accion",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Accion"
+            }
+          },
+          {
+            "name": "entidad_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Entidad Id"
+            }
+          },
+          {
+            "name": "limite",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 200,
+              "title": "Limite"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/metricas": {
+      "get": {
+        "tags": [
+          "administracion"
+        ],
+        "summary": "Metricas",
+        "description": "Insumo del capitulo de resultados: conteos por ruta y estado.",
+        "operationId": "metricas_api_v1_admin_metricas_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/export/geojson": {
+      "get": {
+        "tags": [
+          "administracion"
+        ],
+        "summary": "Export Geojson",
+        "description": "RF-21: exporta sin datos personales.",
+        "operationId": "export_geojson_api_v1_admin_export_geojson_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/export/csv": {
+      "get": {
+        "tags": [
+          "administracion"
+        ],
+        "summary": "Export Csv",
+        "description": "RF-21.",
+        "operationId": "export_csv_api_v1_admin_export_csv_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Body_crear_reporte_api_v1_reportes_post": {
+        "properties": {
+          "foto": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "Foto",
+            "description": "Foto del bache"
+          },
+          "lat": {
+            "type": "number",
+            "title": "Lat"
+          },
+          "lon": {
+            "type": "number",
+            "title": "Lon"
+          },
+          "precision_gps_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Precision Gps M"
+          },
+          "descripcion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Descripcion"
+          },
+          "capturado_en": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capturado En"
+          }
+        },
+        "type": "object",
+        "required": [
+          "foto",
+          "lat",
+          "lon"
+        ],
+        "title": "Body_crear_reporte_api_v1_reportes_post"
+      },
+      "Body_subir_video_api_v1_recorridos__recorrido_id__video_post": {
+        "properties": {
+          "video": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "Video"
+          }
+        },
+        "type": "object",
+        "required": [
+          "video"
+        ],
+        "title": "Body_subir_video_api_v1_recorridos__recorrido_id__video_post"
+      },
+      "CambioRolIn": {
+        "properties": {
+          "rol": {
+            "$ref": "#/components/schemas/Rol"
+          },
+          "motivo": {
+            "type": "string",
+            "title": "Motivo"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rol",
+          "motivo"
+        ],
+        "title": "CambioRolIn"
+      },
+      "DispositivoIn": {
+        "properties": {
+          "expo_push_token": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 10,
+            "title": "Expo Push Token"
+          },
+          "plataforma": {
+            "type": "string",
+            "pattern": "^(ios|android)$",
+            "title": "Plataforma"
+          },
+          "notificaciones_activas": {
+            "type": "boolean",
+            "title": "Notificaciones Activas",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "expo_push_token",
+          "plataforma"
+        ],
+        "title": "DispositivoIn",
+        "description": "RF-10."
+      },
+      "EstadoRecorrido": {
+        "type": "string",
+        "enum": [
+          "grabando",
+          "subiendo",
+          "procesando",
+          "completado",
+          "error"
+        ],
+        "title": "EstadoRecorrido"
+      },
+      "EstadoReporte": {
+        "type": "string",
+        "enum": [
+          "recibido",
+          "en_revision",
+          "validado",
+          "rechazado",
+          "programado",
+          "resuelto",
+          "fusionado"
+        ],
+        "title": "EstadoReporte",
+        "description": "RF-09. El mapa publico solo muestra VALIDADO / PROGRAMADO / RESUELTO."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "LoginIn": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "password": {
+            "type": "string",
+            "title": "Password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "title": "LoginIn"
+      },
+      "MuestraGpsIn": {
+        "properties": {
+          "t_ms": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "T Ms"
+          },
+          "lat": {
+            "type": "number",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Lat"
+          },
+          "lon": {
+            "type": "number",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Lon"
+          },
+          "precision_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Precision M"
+          },
+          "velocidad_mps": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Velocidad Mps"
+          },
+          "rumbo": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rumbo"
+          }
+        },
+        "type": "object",
+        "required": [
+          "t_ms",
+          "lat",
+          "lon"
+        ],
+        "title": "MuestraGpsIn"
+      },
+      "Origen": {
+        "type": "string",
+        "enum": [
+          "ciudadano",
+          "recorrido"
+        ],
+        "title": "Origen"
+      },
+      "Punto": {
+        "properties": {
+          "lat": {
+            "type": "number",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Lat"
+          },
+          "lon": {
+            "type": "number",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Lon"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lat",
+          "lon"
+        ],
+        "title": "Punto"
+      },
+      "RecorridoCierreIn": {
+        "properties": {
+          "finalizado_en": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Finalizado En"
+          },
+          "muestras": {
+            "items": {
+              "$ref": "#/components/schemas/MuestraGpsIn"
+            },
+            "type": "array",
+            "maxItems": 100000,
+            "minItems": 1,
+            "title": "Muestras"
+          }
+        },
+        "type": "object",
+        "required": [
+          "finalizado_en",
+          "muestras"
+        ],
+        "title": "RecorridoCierreIn"
+      },
+      "RecorridoIn": {
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 16,
+            "title": "Idempotency Key"
+          },
+          "ruta_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ruta Id"
+          },
+          "iniciado_en": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Iniciado En"
+          }
+        },
+        "type": "object",
+        "required": [
+          "idempotency_key",
+          "iniciado_en"
+        ],
+        "title": "RecorridoIn",
+        "description": "RF-13."
+      },
+      "RecorridoOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "estado": {
+            "$ref": "#/components/schemas/EstadoRecorrido"
+          },
+          "ruta_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ruta Id"
+          },
+          "iniciado_en": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Iniciado En"
+          },
+          "finalizado_en": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finalizado En"
+          },
+          "frames_extraidos": {
+            "type": "integer",
+            "title": "Frames Extraidos"
+          },
+          "detecciones": {
+            "type": "integer",
+            "title": "Detecciones"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "estado",
+          "ruta_id",
+          "iniciado_en",
+          "finalizado_en",
+          "frames_extraidos",
+          "detecciones"
+        ],
+        "title": "RecorridoOut"
+      },
+      "RefreshIn": {
+        "properties": {
+          "refresh_token": {
+            "type": "string",
+            "title": "Refresh Token"
+          }
+        },
+        "type": "object",
+        "required": [
+          "refresh_token"
+        ],
+        "title": "RefreshIn"
+      },
+      "RegistroIn": {
+        "properties": {
+          "nombre": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 2,
+            "title": "Nombre"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 10,
+            "title": "Password"
+          },
+          "acepta_privacidad": {
+            "type": "boolean",
+            "title": "Acepta Privacidad"
+          }
+        },
+        "type": "object",
+        "required": [
+          "nombre",
+          "email",
+          "password",
+          "acepta_privacidad"
+        ],
+        "title": "RegistroIn",
+        "description": "RF-01."
+      },
+      "ReporteOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "estado": {
+            "$ref": "#/components/schemas/EstadoReporte"
+          },
+          "origen": {
+            "$ref": "#/components/schemas/Origen"
+          },
+          "descripcion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Descripcion"
+          },
+          "lat": {
+            "type": "number",
+            "title": "Lat"
+          },
+          "lon": {
+            "type": "number",
+            "title": "Lon"
+          },
+          "precision_gps_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Precision Gps M"
+          },
+          "severidad_ia": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Severidad"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "confianza_ia": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confianza Ia"
+          },
+          "severidad_validada": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Severidad"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "prioridad": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prioridad"
+          },
+          "veces_reportado": {
+            "type": "integer",
+            "title": "Veces Reportado"
+          },
+          "creado_en": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Creado En"
+          },
+          "publicado_en": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Publicado En"
+          },
+          "requiere_correccion_gps": {
+            "type": "boolean",
+            "title": "Requiere Correccion Gps",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "estado",
+          "origen",
+          "descripcion",
+          "lat",
+          "lon",
+          "precision_gps_m",
+          "severidad_ia",
+          "confianza_ia",
+          "severidad_validada",
+          "prioridad",
+          "veces_reportado",
+          "creado_en",
+          "publicado_en"
+        ],
+        "title": "ReporteOut"
+      },
+      "RevisionIn": {
+        "properties": {
+          "decision": {
+            "type": "string",
+            "pattern": "^(validar|rechazar|fusionar)$",
+            "title": "Decision"
+          },
+          "severidad_validada": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Severidad"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "punto_corregido": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Punto"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fusionar_en_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fusionar En Id"
+          },
+          "motivo": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 5,
+            "title": "Motivo"
+          }
+        },
+        "type": "object",
+        "required": [
+          "decision",
+          "motivo"
+        ],
+        "title": "RevisionIn",
+        "description": "RF-17. Ningun candidato de IA se publica sin pasar por aqui."
+      },
+      "Rol": {
+        "type": "string",
+        "enum": [
+          "ciudadano",
+          "operador",
+          "revisor",
+          "admin"
+        ],
+        "title": "Rol",
+        "description": "RF-03. Los cuatro roles de la propuesta."
+      },
+      "RutaIn": {
+        "properties": {
+          "codigo": {
+            "type": "string",
+            "title": "Codigo"
+          },
+          "nombre": {
+            "type": "string",
+            "title": "Nombre"
+          },
+          "tipo_via": {
+            "type": "string",
+            "title": "Tipo Via",
+            "default": "avenida"
+          },
+          "exposicion_transito": {
+            "type": "integer",
+            "title": "Exposicion Transito",
+            "default": 3
+          },
+          "es_holdout": {
+            "type": "boolean",
+            "title": "Es Holdout",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "codigo",
+          "nombre"
+        ],
+        "title": "RutaIn"
+      },
+      "RutaOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "codigo": {
+            "type": "string",
+            "title": "Codigo"
+          },
+          "nombre": {
+            "type": "string",
+            "title": "Nombre"
+          },
+          "tipo_via": {
+            "type": "string",
+            "title": "Tipo Via"
+          },
+          "exposicion_transito": {
+            "type": "integer",
+            "title": "Exposicion Transito"
+          },
+          "es_holdout": {
+            "type": "boolean",
+            "title": "Es Holdout"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "codigo",
+          "nombre",
+          "tipo_via",
+          "exposicion_transito",
+          "es_holdout"
+        ],
+        "title": "RutaOut"
+      },
+      "Severidad": {
+        "type": "string",
+        "enum": [
+          "leve",
+          "moderada",
+          "grave"
+        ],
+        "title": "Severidad"
+      },
+      "TokensOut": {
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "title": "Access Token"
+          },
+          "refresh_token": {
+            "type": "string",
+            "title": "Refresh Token"
+          },
+          "token_type": {
+            "type": "string",
+            "title": "Token Type",
+            "default": "bearer"
+          },
+          "expires_in": {
+            "type": "integer",
+            "title": "Expires In"
+          }
+        },
+        "type": "object",
+        "required": [
+          "access_token",
+          "refresh_token",
+          "expires_in"
+        ],
+        "title": "TokensOut"
+      },
+      "UsuarioAdminOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nombre": {
+            "type": "string",
+            "title": "Nombre"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "rol": {
+            "$ref": "#/components/schemas/Rol"
+          },
+          "activo": {
+            "type": "boolean",
+            "title": "Activo"
+          },
+          "email_verificado": {
+            "type": "boolean",
+            "title": "Email Verificado"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nombre",
+          "email",
+          "rol",
+          "activo",
+          "email_verificado"
+        ],
+        "title": "UsuarioAdminOut"
+      },
+      "UsuarioOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nombre": {
+            "type": "string",
+            "title": "Nombre"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "rol": {
+            "$ref": "#/components/schemas/Rol"
+          },
+          "email_verificado": {
+            "type": "boolean",
+            "title": "Email Verificado"
+          },
+          "creado_en": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Creado En"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nombre",
+          "email",
+          "rol",
+          "email_verificado",
+          "creado_en"
+        ],
+        "title": "UsuarioOut"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}
