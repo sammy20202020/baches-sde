@@ -10,12 +10,13 @@ import { useRef, useState } from 'react';
 import { Alert, Image, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImageManipulator from 'expo-image-manipulator';
-import MapView, { Marker } from 'react-native-maps';
+import { Camera, Map, Marker } from '@maplibre/maplibre-react-native';
 import { useRouter } from 'expo-router';
 
 import { crearBorrador } from '@/db/outbox';
 import { sincronizar } from '@/db/sync';
 import { CENTRO_SDE, PRECISION_DUDOSA_M, PermisoUbicacionDenegado, posicionActual, type Posicion } from '@/lib/ubicacion';
+import { ESTILO_OSM } from '@/ui/mapa-estilo';
 import { Aviso, Boton, Campo, Tarjeta } from '@/ui/componentes';
 import { colores, espacio, radio } from '@/ui/theme';
 
@@ -161,37 +162,27 @@ export default function NuevoReporte() {
 
       <Tarjeta>
         <Text style={e.tituloSeccion}>Confirma la ubicacion</Text>
-        <Text style={e.ayuda}>Arrastra el marcador si el punto no cae exactamente sobre el bache.</Text>
+        <Text style={e.ayuda}>Toca el mapa si el punto no cae exactamente sobre el bache.</Text>
 
         {!!posicion && (
-          <MapView
-            style={e.mapa}
-            region={{
-              latitude: posicion.lat,
-              longitude: posicion.lon,
-              latitudeDelta: 0.004,
-              longitudeDelta: 0.004,
-            }}
-            onPress={(ev) =>
-              setPosicion({
-                lat: ev.nativeEvent.coordinate.latitude,
-                lon: ev.nativeEvent.coordinate.longitude,
-                precision_m: posicion.precision_m,
-              })
-            }
-          >
-            <Marker
-              draggable
-              coordinate={{ latitude: posicion.lat, longitude: posicion.lon }}
-              onDragEnd={(ev) =>
-                setPosicion({
-                  lat: ev.nativeEvent.coordinate.latitude,
-                  lon: ev.nativeEvent.coordinate.longitude,
-                  precision_m: posicion.precision_m,
-                })
-              }
-            />
-          </MapView>
+          <View style={e.mapa}>
+            <Map
+              style={{ flex: 1 }}
+              mapStyle={ESTILO_OSM}
+              attribution
+              onPress={(ev) => {
+                const [lon, lat] = (ev.nativeEvent as { lngLat: [number, number] }).lngLat;
+                setPosicion({ lat, lon, precision_m: posicion.precision_m });
+              }}
+            >
+              <Camera
+                initialViewState={{ center: [posicion.lon, posicion.lat], zoom: 16 }}
+              />
+              <Marker lngLat={[posicion.lon, posicion.lat]}>
+                <View style={e.pin} />
+              </Marker>
+            </Map>
+          </View>
         )}
 
         <Text style={e.coordenadas}>
@@ -248,7 +239,21 @@ const e = StyleSheet.create({
   vistaPrevia: { width: '100%', height: 200, borderRadius: radio.md, marginBottom: espacio.sm },
   tituloSeccion: { fontSize: 16, fontWeight: '700', color: colores.texto },
   ayuda: { fontSize: 13, color: colores.textoSuave, marginTop: espacio.xs, lineHeight: 18 },
-  mapa: { width: '100%', height: 220, borderRadius: radio.sm, marginTop: espacio.sm },
+  mapa: {
+    width: '100%',
+    height: 220,
+    borderRadius: radio.sm,
+    marginTop: espacio.sm,
+    overflow: 'hidden',
+  },
+  pin: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: colores.error,
+    borderWidth: 3,
+    borderColor: '#FFFFFF',
+  },
   coordenadas: { fontFamily: 'Courier', color: colores.texto, marginTop: espacio.sm },
   enlace: { color: colores.primarioClaro, fontWeight: '600' },
 });

@@ -1,4 +1,5 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { ReactNode } from 'react';
 import { colores, espacio, radio, TOQUE_MINIMO } from './theme';
 
@@ -57,6 +58,18 @@ export function Campo({
   );
 }
 
+export function CintaDemo() {
+  // Sin el inset la cinta se dibuja encima del reloj y los iconos del sistema.
+  const inset = useSafeAreaInsets();
+  return (
+    <View style={[e.cintaDemo, { paddingTop: inset.top + 6 }]} accessibilityRole="alert">
+      <Text style={e.cintaDemoTexto}>
+        MODO DEMOSTRACION · datos de ejemplo, sin servidor
+      </Text>
+    </View>
+  );
+}
+
 export function Tarjeta({ children }: { children: ReactNode }) {
   return <View style={e.tarjeta}>{children}</View>;
 }
@@ -100,6 +113,13 @@ const e = StyleSheet.create({
     fontSize: 16,
   },
   error: { color: colores.error, fontSize: 13, marginTop: espacio.xs },
+  cintaDemo: {
+    backgroundColor: colores.aviso,
+    paddingBottom: 6,
+    paddingHorizontal: espacio.md,
+    alignItems: 'center',
+  },
+  cintaDemoTexto: { color: '#FFFFFF', fontSize: 12, fontWeight: '800', letterSpacing: 0.3 },
   tarjeta: {
     backgroundColor: colores.superficie,
     borderRadius: radio.md,

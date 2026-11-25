@@ -33,11 +33,6 @@
         "RECORD_AUDIO",
         "POST_NOTIFICATIONS"
       ],
-      "config": {
-        "googleMaps": {
-          "apiKey": "PONER_AQUI_LA_API_KEY_DE_GOOGLE_MAPS_ANDROID"
-        }
-      },
       "predictiveBackGestureEnabled": false
     },
     "web": {
@@ -79,10 +74,12 @@
             "usesCleartextTraffic": true
           }
         }
-      ]
+      ],
+      "@maplibre/maplibre-react-native"
     ],
     "extra": {
-      "apiUrl": ""
+      "apiUrl": "",
+      "demo": true
     }
   }
 }

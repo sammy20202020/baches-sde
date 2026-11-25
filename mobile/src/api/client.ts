@@ -6,7 +6,11 @@ import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import Constants from 'expo-constants';
 import * as SecureStore from 'expo-secure-store';
 
+import { adaptadorDemo } from './demo';
 import * as servidor from './servidor';
+
+/** Build de demostracion: sin backend, datos de ejemplo en memoria. */
+export const MODO_DEMO = Constants.expoConfig?.extra?.demo === true;
 
 // La direccion del servidor se resuelve en cada peticion, no al importar el
 // modulo: el usuario puede cambiarla desde Ajustes sin reiniciar la app.
@@ -29,6 +33,10 @@ export const tokens = {
 };
 
 export const api = axios.create({ timeout: 20_000 });
+
+// En demostracion se sustituye el transporte entero: ninguna pantalla
+// cambia, siguen pidiendo lo mismo y reciben la misma forma de datos.
+if (MODO_DEMO) api.defaults.adapter = adaptadorDemo;
 
 api.interceptors.request.use(async (config) => {
   config.baseURL = await servidor.cargar();

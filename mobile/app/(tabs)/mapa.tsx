@@ -1,12 +1,12 @@
 /** RF-11 + RF-12: mapa publico de reportes validados, con filtros. */
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import MapView, { Callout, Marker } from 'react-native-maps';
+import { Camera, GeoJSONSource, Layer, Map } from '@maplibre/maplibre-react-native';
 import { useFocusEffect } from 'expo-router';
 
 import { api, mensajeDeError } from '@/api/client';
 import type { GeoJson, PuntoMapa, Severidad } from '@/api/tipos';
-import { CENTRO_SDE } from '@/lib/ubicacion';
+import { CENTRO, ESTILO_OSM } from '@/ui/mapa-estilo';
 import { Aviso } from '@/ui/componentes';
 import { colorSeveridad, colores, espacio, etiquetaEstado, radio, TOQUE_MINIMO } from '@/ui/theme';
 
@@ -17,6 +17,7 @@ export default function Mapa() {
   const [puntos, setPuntos] = useState<PuntoMapa[]>([]);
   const [filtro, setFiltro] = useState<FiltroSeveridad>('todas');
   const [cargando, setCargando] = useState(true);
+  const [seleccionado, setSeleccionado] = useState<PuntoMapa | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const cargar = useCallback(async (severidad: FiltroSeveridad) => {
@@ -72,32 +73,60 @@ export default function Mapa() {
         </View>
       )}
 
-      <MapView
-        style={{ flex: 1 }}
-        initialRegion={{ ...CENTRO_SDE, latitudeDelta: 0.09, longitudeDelta: 0.09 }}
-      >
-        {puntos.map((p) => (
-          <Marker
-            key={p.properties.id}
-            coordinate={{ latitude: p.geometry.coordinates[1], longitude: p.geometry.coordinates[0] }}
-            pinColor={colorSeveridad(p.properties.severidad)}
-          >
-            <Callout>
-              <View style={{ padding: 4, minWidth: 180 }}>
-                <Text style={{ fontWeight: '700' }}>
-                  {p.properties.severidad ? `Severidad ${p.properties.severidad}` : 'Sin clasificar'}
-                </Text>
-                <Text>Estado: {etiquetaEstado[p.properties.estado] ?? p.properties.estado}</Text>
-                {p.properties.prioridad != null && <Text>Prioridad: {p.properties.prioridad}</Text>}
-                <Text>Reportado {p.properties.veces_reportado} vez(ces)</Text>
-                <Text style={{ color: colores.textoSuave, fontSize: 12 }}>
-                  {new Date(p.properties.fecha).toLocaleDateString('es-DO')}
-                </Text>
-              </View>
-            </Callout>
-          </Marker>
-        ))}
-      </MapView>
+      <Map style={{ flex: 1 }} mapStyle={ESTILO_OSM} attribution>
+        <Camera initialViewState={{ center: CENTRO, zoom: 10.5 }} />
+
+        {/* Una sola capa para todos los puntos: con cientos de marcadores
+            individuales el mapa se arrastra; asi lo dibuja el motor nativo. */}
+        <GeoJSONSource
+          id="baches"
+          data={{
+            type: 'FeatureCollection',
+            features: puntos.map((p) => ({
+              type: 'Feature',
+              geometry: p.geometry,
+              properties: {
+                color: colorSeveridad(p.properties.severidad),
+                radio: p.properties.severidad === 'grave' ? 9 : p.properties.severidad === 'moderada' ? 7 : 5,
+              },
+            })),
+          }}
+          onPress={(ev) => {
+            const f = (ev as { features?: { properties?: Record<string, unknown> }[] }).features?.[0];
+            if (f) setSeleccionado(puntos.find((p) => p.properties.id === f.properties?.id) ?? null);
+          }}
+        >
+          <Layer
+            id="baches-circulo"
+            type="circle"
+            style={{
+              circleColor: ['get', 'color'],
+              circleRadius: ['get', 'radio'],
+              circleStrokeWidth: 2,
+              circleStrokeColor: '#FFFFFF',
+              circleOpacity: 0.9,
+            }}
+          />
+        </GeoJSONSource>
+      </Map>
+
+      {seleccionado && (
+        <View style={e.detalle}>
+          <Text style={e.detalleTitulo}>
+            {seleccionado.properties.severidad
+              ? `Severidad ${seleccionado.properties.severidad}`
+              : 'Sin clasificar'}
+          </Text>
+          <Text style={e.detalleLinea}>
+            Estado: {etiquetaEstado[seleccionado.properties.estado] ?? seleccionado.properties.estado}
+            {seleccionado.properties.prioridad != null && ` · Prioridad ${seleccionado.properties.prioridad}`}
+          </Text>
+          <Text style={e.detalleLinea}>
+            Reportado {seleccionado.properties.veces_reportado} vez(ces) ·{' '}
+            {new Date(seleccionado.properties.fecha).toLocaleDateString('es-DO')}
+          </Text>
+        </View>
+      )}
 
       <View style={e.pie}>
         {cargando ? (
@@ -134,4 +163,12 @@ const e = StyleSheet.create({
     backgroundColor: colores.superficie,
   },
   pieTexto: { color: colores.textoSuave },
+  detalle: {
+    backgroundColor: colores.superficie,
+    borderTopWidth: 1,
+    borderTopColor: colores.borde,
+    padding: espacio.md,
+  },
+  detalleTitulo: { fontSize: 16, fontWeight: '700', color: colores.texto, textTransform: 'capitalize' },
+  detalleLinea: { color: colores.textoSuave, marginTop: 2 },
 });
