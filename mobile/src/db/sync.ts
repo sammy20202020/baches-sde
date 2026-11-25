@@ -5,7 +5,7 @@
  * Nunca corre dos veces a la vez: un doble envio es exactamente el duplicado
  * que la clave de idempotencia existe para evitar.
  */
-import * as FileSystem from 'expo-file-system';
+import { File } from 'expo-file-system';
 import NetInfo from '@react-native-community/netinfo';
 
 import { api, mensajeDeError } from '../api/client';
@@ -19,8 +19,11 @@ let enCurso = false;
 const esperaMs = (intentos: number) => Math.min(2 ** (intentos + 1) * 1000, 30_000);
 
 async function enviar(borrador: Borrador): Promise<void> {
-  const info = await FileSystem.getInfoAsync(borrador.foto_uri);
-  if (!info.exists) {
+  // expo-file-system 58 retiro getInfoAsync: ahora se consulta con `File`.
+  // Llamar a la funcion vieja lanzaba y el reporte quedaba en error sin decir
+  // por que, que es justo lo que no debe pasar con la cola sin conexion.
+  const foto = new File(borrador.foto_uri);
+  if (!foto.exists) {
     // La foto ya no esta (cache limpiada): no tiene sentido reintentar para siempre.
     await marcar(borrador.id, 'error', { error: 'La foto ya no esta disponible en el telefono' });
     return;

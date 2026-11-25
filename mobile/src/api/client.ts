@@ -94,6 +94,9 @@ export function mensajeDeError(error: unknown): string {
     if (Array.isArray(detalle)) return detalle.map((d: { msg: string }) => d.msg).join('. ');
     return `Error ${error.response.status}`;
   }
+  // Incluir la causa: un "error inesperado" sin detalle deja al usuario y al
+  // equipo sin nada con que diagnosticar, como paso con getInfoAsync.
+  if (error instanceof Error && error.message) return error.message;
   return 'Ocurrio un error inesperado';
 }
 
